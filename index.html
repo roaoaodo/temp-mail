@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DROPMAIL — Временная почта</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #00ff88;
+    --accent2: #ff3cac;
+    --text: #e8e8f0;
+    --muted: #6060808;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .noise {
+    position: fixed;
+    inset: 0;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Header */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--accent); }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    background: rgba(0,255,136,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(0,255,136,0.3);
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+  }
+
+  /* Main */
+  main {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px 40px;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+    position: relative;
+  }
+
+  .hero p {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: #808096;
+    letter-spacing: 0.02em;
+  }
+
+  /* Email box */
+  .email-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s 0.1s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .email-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .email-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: #606080;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+  }
+
+  .email-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .email-address {
+    font-family: var(--mono);
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-weight: 700;
+    color: var(--accent);
+    flex: 1;
+    word-break: break-all;
+    min-width: 200px;
+    padding: 12px 16px;
+    background: rgba(0,255,136,0.05);
+    border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .email-address:hover {
+    background: rgba(0,255,136,0.1);
+    border-color: rgba(0,255,136,0.4);
+  }
+
+  .email-address.copied::after {
+    content: 'СКОПИРОВАНО!';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem;
+    background: var(--accent);
+    color: #000;
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    pointer-events: none;
+  }
+
+  .btn {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 12px 20px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover { background: #00e67a; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: #4a4a6a; background: var(--surface2); }
+
+  .btn-danger {
+    background: transparent;
+    color: #ff6b6b;
+    border: 1px solid rgba(255,107,107,0.3);
+  }
+  .btn-danger:hover { background: rgba(255,107,107,0.1); }
+
+  .email-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: #606080;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #404060;
+    flex-shrink: 0;
+  }
+
+  .status-dot.active {
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  /* Inbox */
+  .inbox {
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .inbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .inbox-title {
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .count-badge {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    background: var(--accent2);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 20px;
+    min-width: 20px;
+    text-align: center;
+    display: none;
+  }
+
+  .count-badge.show { display: inline-block; }
+
+  .inbox-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #606080;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.8;
+  }
+
+  .inbox-empty .icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+    opacity: 0.3;
+  }
+
+  /* Message list */
+  .message-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .message-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: start;
+  }
+
+  .message-item:hover {
+    border-color: rgba(0,255,136,0.3);
+    background: var(--surface2);
+    transform: translateX(3px);
+  }
+
+  .message-item.unread {
+    border-left: 3px solid var(--accent);
+  }
+
+  .msg-from {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--accent);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .msg-subject {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .msg-preview {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: #606080;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .msg-time {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: #505070;
+    white-space: nowrap;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none;
+    place-items: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open { display: grid; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: scaleIn 0.2s ease;
+  }
+
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .modal-meta {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: #606080;
+    margin-top: 6px;
+    line-height: 1.8;
+  }
+
+  .modal-close {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { border-color: #ff6b6b; color: #ff6b6b; }
+
+  .modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.8;
+    color: #c0c0d8;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .modal-body iframe {
+    width: 100%;
+    border: none;
+    min-height: 400px;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(0,255,136,0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  /* Notifications */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .toast {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    padding: 12px 20px;
+    border-radius: 3px;
+    border-left: 3px solid var(--accent);
+    background: var(--surface2);
+    color: var(--text);
+    animation: slideIn 0.3s ease;
+    max-width: 300px;
+  }
+
+  .toast.error { border-left-color: #ff6b6b; }
+
+  /* Footer */
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: #404060;
+  }
+
+  footer a { color: #606080; text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Loading state */
+  .loading-state {
+    display: none;
+    padding: 40px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: #606080;
+  }
+
+  .loading-state.show { display: block; }
+
+  @media (max-width: 600px) {
+    header { padding: 16px 20px; }
+    main { padding: 40px 16px 24px; }
+    .email-box { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+
+<header>
+  <div class="logo">DROP<span>MAIL</span></div>
+  <span class="badge">TEMP EMAIL</span>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Временная<br><em>почта</em> мгновенно</h1>
+    <p>// без регистрации · бесплатно</p>
+  </div>
+
+  <div class="email-box" id="emailBox">
+    <div class="email-label">// ваш временный адрес</div>
+    <div class="email-display">
+      <div class="email-address" id="emailAddress" title="Нажми чтобы скопировать">
+        <span class="spinner"></span> генерация адреса...
+      </div>
+    </div>
+    <div class="email-actions">
+      <button class="btn btn-primary" onclick="copyEmail()">Копировать</button>
+      <button class="btn btn-ghost" onclick="refreshMessages()">↺ Обновить</button>
+      <button class="btn btn-danger" onclick="generateNew()">✕ Новый адрес</button>
+    </div>
+    <div class="status-bar">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Инициализация...</span>
+    </div>
+  </div>
+
+  <div class="inbox">
+    <div class="inbox-header">
+      <div class="inbox-title">
+        Входящие
+        <span class="count-badge" id="countBadge">0</span>
+      </div>
+      <span id="lastCheck" style="font-family: var(--mono); font-size: 0.7rem; color: #505070;"></span>
+    </div>
+
+    <div class="loading-state" id="loadingState">
+      <span class="spinner"></span> загрузка писем...
+    </div>
+
+    <div id="inboxEmpty" class="inbox-empty">
+      <span class="icon">📭</span>
+      Писем ещё нет.<br>Используй адрес выше — письма появятся здесь автоматически.
+    </div>
+
+    <div class="message-list" id="messageList" style="display:none;"></div>
+  </div>
+</main>
+
+<footer>
+  Письма хранятся 24 часа · Используй только для временных нужд
+</footer>
+
+<!-- Toast container -->
+<div class="toast-container" id="toasts"></div>
+
+<!-- Message modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div id="modalSubject" style="font-weight: 800; font-size: 1.1rem;"></div>
+        <div class="modal-meta" id="modalMeta"></div>
+      </div>
+      <button class="modal-close" onclick="closeModalBtn()">ESC / закрыть</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const API = 'https://api.mail.tm';
+let token = null;
+let currentEmail = null;
+let autoRefreshInterval = null;
+let messages = [];
+
+// Init
+(async () => {
+  try {
+    await generateNew();
+  } catch(e) {
+    setStatus(false, 'Ошибка подключения к API');
+    showToast('Не удалось подключиться к серверу', true);
+  }
+})();
+
+async function generateNew() {
+  clearInterval(autoRefreshInterval);
+  token = null;
+  currentEmail = null;
+  messages = [];
+  document.getElementById('messageList').style.display = 'none';
+  document.getElementById('inboxEmpty').style.display = 'block';
+  document.getElementById('emailAddress').innerHTML = '<span class="spinner"></span> генерация...';
+  setStatus(false, 'Генерация адреса...');
+
+  try {
+    // 1. Get domains
+    const domainsRes = await fetch(`${API}/domains?page=1`);
+    if (!domainsRes.ok) throw new Error('domains fail');
+    const domainsData = await domainsRes.json();
+    const domains = domainsData['hydra:member'] || domainsData.member || [];
+    if (!domains.length) throw new Error('no domains');
+    const domain = domains[0].domain;
+
+    // 2. Generate random credentials
+    const rand = () => Math.random().toString(36).substring(2, 10);
+    const address = `${rand()}@${domain}`;
+    const password = rand() + rand();
+
+    // 3. Create account
+    const createRes = await fetch(`${API}/accounts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address, password })
+    });
+    if (!createRes.ok) throw new Error('create fail');
+
+    // 4. Get token
+    const tokenRes = await fetch(`${API}/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address, password })
+    });
+    if (!tokenRes.ok) throw new Error('token fail');
+    const tokenData = await tokenRes.json();
+    token = tokenData.token;
+    currentEmail = address;
+
+    // Update UI
+    const el = document.getElementById('emailAddress');
+    el.textContent = currentEmail;
+    el.onclick = copyEmail;
+
+    setStatus(true, 'Готово · автообновление каждые 5 сек');
+    showToast('Новый адрес создан!');
+
+    // Start polling
+    await refreshMessages();
+    autoRefreshInterval = setInterval(refreshMessages, 5000);
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('emailAddress').textContent = 'Ошибка генерации';
+    setStatus(false, 'Ошибка: ' + e.message);
+    showToast('Ошибка создания адреса', true);
+  }
+}
+
+async function refreshMessages() {
+  if (!token) return;
+  document.getElementById('loadingState').classList.add('show');
+
+  try {
+    const res = await fetch(`${API}/messages`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('fetch messages fail');
+    const data = await res.json();
+    const msgs = data['hydra:member'] || data.member || [];
+
+    const newCount = msgs.filter(m => !messages.find(old => old.id === m.id)).length;
+    if (newCount > 0 && messages.length > 0) {
+      showToast(`📬 ${newCount} новое письмо!`);
+    }
+    messages = msgs;
+    renderMessages();
+
+    const now = new Date();
+    document.getElementById('lastCheck').textContent = 
+      `обновлено ${now.toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+  } catch(e) {
+    console.error(e);
+  }
+
+  document.getElementById('loadingState').classList.remove('show');
+}
+
+function renderMessages() {
+  const list = document.getElementById('messageList');
+  const empty = document.getElementById('inboxEmpty');
+  const badge = document.getElementById('countBadge');
+
+  if (!messages.length) {
+    list.style.display = 'none';
+    empty.style.display = 'block';
+    badge.classList.remove('show');
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.style.display = 'flex';
+  badge.textContent = messages.length;
+  badge.classList.add('show');
+
+  list.innerHTML = messages.map(msg => {
+    const from = msg.from?.address || msg.from || 'неизвестно';
+    const subj = msg.subject || '(без темы)';
+    const intro = msg.intro || '';
+    const time = formatTime(msg.createdAt);
+    const unread = msg.seen === false ? 'unread' : '';
+    return `
+      <div class="message-item ${unread}" onclick="openMessage('${msg.id}')">
+        <div>
+          <div class="msg-from">${escHtml(from)}</div>
+          <div class="msg-subject">${escHtml(subj)}</div>
+          <div class="msg-preview">${escHtml(intro)}</div>
+        </div>
+        <div class="msg-time">${time}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function openMessage(id) {
+  const msg = messages.find(m => m.id === id);
+  if (!msg) return;
+
+  document.getElementById('modalSubject').textContent = msg.subject || '(без темы)';
+  document.getElementById('modalMeta').innerHTML = 
+    `От: ${escHtml(msg.from?.address || msg.from || '')}<br>Дата: ${formatTime(msg.createdAt, true)}`;
+  document.getElementById('modalBody').textContent = 'загрузка...';
+  document.getElementById('modalOverlay').classList.add('open');
+
+  try {
+    const res = await fetch(`${API}/messages/${id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    
+    if (data.html && data.html.length) {
+      const iframe = document.createElement('iframe');
+      iframe.sandbox = 'allow-same-origin';
+      iframe.style.width = '100%';
+      iframe.style.minHeight = '400px';
+      iframe.style.border = 'none';
+      iframe.style.background = '#fff';
+      iframe.style.borderRadius = '3px';
+      document.getElementById('modalBody').innerHTML = '';
+      document.getElementById('modalBody').appendChild(iframe);
+      iframe.contentDocument.open();
+      iframe.contentDocument.write(data.html.join ? data.html.join('') : data.html);
+      iframe.contentDocument.close();
+      iframe.onload = () => {
+        iframe.style.height = iframe.contentDocument.body.scrollHeight + 'px';
+      };
+    } else {
+      document.getElementById('modalBody').textContent = data.text || '(письмо пустое)';
+    }
+
+    // Mark as read locally
+    msg.seen = true;
+    renderMessages();
+  } catch(e) {
+    document.getElementById('modalBody').textContent = 'Ошибка загрузки письма';
+  }
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+}
+
+function closeModalBtn() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModalBtn();
+});
+
+function copyEmail() {
+  if (!currentEmail) return;
+
+  const el = document.getElementById('emailAddress');
+
+  const doSuccess = () => {
+    el.classList.add('copied');
+    setTimeout(() => el.classList.remove('copied'), 1500);
+    showToast('Адрес скопирован!');
+  };
+
+  // Modern clipboard API
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(currentEmail).then(doSuccess).catch(() => fallbackCopy());
+  } else {
+    fallbackCopy();
+  }
+
+  function fallbackCopy() {
+    const ta = document.createElement('textarea');
+    ta.value = currentEmail;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+      doSuccess();
+    } catch(e) {
+      showToast('Скопируй вручную: ' + currentEmail, true);
+    }
+    document.body.removeChild(ta);
+  }
+}
+
+function setStatus(active, text) {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  dot.className = 'status-dot' + (active ? ' active' : '');
+  txt.textContent = text;
+}
+
+function showToast(msg, isError = false) {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+function formatTime(str, full = false) {
+  if (!str) return '';
+  const d = new Date(str);
+  if (full) return d.toLocaleString('ru-RU');
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 60000) return 'только что';
+  if (diff < 3600000) return Math.floor(diff/60000) + ' мин назад';
+  if (diff < 86400000) return d.toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
+  return d.toLocaleDateString('ru-RU');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
