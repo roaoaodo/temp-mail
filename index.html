@@ -26,7 +26,7 @@
     background: var(--bg);
     flex-direction: column; gap: 0;
   }
-  .welcome-inner { text-align: center; padding: 32px 24px; max-width: 480px; width: 100%; }
+  .welcome-inner { text-align: center; padding: 32px 24px; max-width: 480px; width: 100%; margin: 0 auto; }
   .welcome .big-logo { font-family: var(--sans); font-weight: 800; font-size: clamp(2.8rem,8vw,4.5rem); letter-spacing: -0.04em; margin-bottom: 6px; }
   .welcome .big-logo span { color: var(--accent); }
   .welcome .tagline { font-family: var(--mono); font-size: 0.78rem; color: #606080; margin-bottom: 40px; letter-spacing: 0.05em; }
@@ -179,6 +179,30 @@
   @keyframes spin { to{transform:rotate(360deg)} }
   @keyframes slideIn { from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)} }
   @keyframes fadeIn { from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
+
+  /* About modal */
+  .about-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+  .about-overlay.open { display: flex; }
+  .about-modal { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; width: 100%; max-width: 400px; overflow: hidden; position: relative; }
+  .about-modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .about-modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .about-modal-title { font-weight: 800; font-size: 0.95rem; }
+  .about-close { background: none; border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 0.62rem; padding: 5px 10px; border-radius: 2px; cursor: pointer; transition: all 0.2s; }
+  .about-close:hover { border-color: #ff6b6b; color: #ff6b6b; }
+  .about-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .about-tab { flex: 1; font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 10px 6px; background: none; border: none; color: #606080; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; }
+  .about-tab:hover { color: var(--text); }
+  .about-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .about-body { padding: 24px 20px; min-height: 120px; }
+  .about-pane { display: none; }
+  .about-pane.active { display: block; }
+  .about-empty { font-family: var(--mono); font-size: 0.72rem; color: #404060; text-align: center; padding: 20px 0; }
+  .about-link { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; text-decoration: none; color: var(--text); transition: all 0.2s; font-family: var(--mono); font-size: 0.78rem; }
+  .about-link:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,255,136,0.05); }
+  .about-link .tg-icon { font-size: 1.4rem; }
+  .about-role { font-size: 0.6rem; color: #606080; margin-top: 2px; }
+  .sidebar-about-btn { width: 100%; font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 3px; padding: 10px; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
+  .sidebar-about-btn:hover { border-color: var(--accent); color: var(--accent); }
 </style>
 </head>
 <body>
@@ -223,6 +247,7 @@
     </div>
     <div class="sidebar-footer">
       <button class="sidebar-new-btn" onclick="generateNewAndClose()">+ Создать новый адрес</button>
+      <button class="sidebar-about-btn" onclick="openAbout()">ℹ️ Создатели</button>
     </div>
   </div>
 
@@ -286,6 +311,44 @@
         <button class="btn-back" onclick="closeMessage()">← Назад</button>
       </div>
       <div class="msg-panel-body" id="msgBody"></div>
+    </div>
+  </div>
+
+  <!-- About modal -->
+  <div class="about-overlay" id="aboutOverlay" onclick="closeAbout(event)">
+    <div class="about-modal">
+      <div class="about-modal-header">
+        <div class="about-modal-title">О проекте</div>
+        <button class="about-close" onclick="closeAboutBtn()">✕ Закрыть</button>
+      </div>
+      <div class="about-tabs">
+        <button class="about-tab active" onclick="switchTab('owner')">Владелец</button>
+        <button class="about-tab" onclick="switchTab('creators')">Создатели</button>
+        <button class="about-tab" onclick="switchTab('testers')">Тестеры</button>
+      </div>
+      <div class="about-body">
+        <div class="about-pane active" id="tab-owner">
+          <a class="about-link" href="https://t.me/tocim" target="_blank" rel="noopener noreferrer">
+            <span class="tg-icon">✈️</span>
+            <div>
+              <div>@tocim</div>
+              <div class="about-role">Владелец проекта</div>
+            </div>
+          </a>
+        </div>
+        <div class="about-pane" id="tab-creators">
+          <div class="about-empty">Создатели скоро появятся...</div>
+        </div>
+        <div class="about-pane" id="tab-testers">
+          <a class="about-link" href="https://t.me/mol0koO0" target="_blank" rel="noopener noreferrer">
+            <span class="tg-icon">✈️</span>
+            <div>
+              <div>@mol0koO0</div>
+              <div class="about-role">Тестер</div>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -592,6 +655,16 @@ function formatTime(str, full=false) {
 }
 
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// ===== ABOUT =====
+function openAbout() { closeSidebar(); document.getElementById('aboutOverlay').classList.add('open'); }
+function closeAbout(e) { if(e.target===document.getElementById('aboutOverlay')) closeAboutBtn(); }
+function closeAboutBtn() { document.getElementById('aboutOverlay').classList.remove('open'); }
+function switchTab(name) {
+  document.querySelectorAll('.about-tab').forEach((t,i)=>{ t.classList.toggle('active', ['owner','creators','testers'][i]===name); });
+  document.querySelectorAll('.about-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
 </script>
 </body>
 </html>
