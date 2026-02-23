@@ -18,105 +18,229 @@
     background-image: linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
     background-size: 40px 40px; pointer-events: none; z-index: 0;
   }
-  .app { position: fixed; inset: 0; display: flex; flex-direction: column; z-index: 1; }
+
+  /* ===== WELCOME SCREEN ===== */
+  .welcome {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg);
+    flex-direction: column; gap: 0;
+  }
+  .welcome-inner { text-align: center; padding: 32px 24px; max-width: 480px; width: 100%; }
+  .welcome .big-logo { font-family: var(--sans); font-weight: 800; font-size: clamp(2.8rem,8vw,4.5rem); letter-spacing: -0.04em; margin-bottom: 6px; }
+  .welcome .big-logo span { color: var(--accent); }
+  .welcome .tagline { font-family: var(--mono); font-size: 0.78rem; color: #606080; margin-bottom: 40px; letter-spacing: 0.05em; }
+  .welcome-features {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px;
+  }
+  .feat { font-family: var(--mono); font-size: 0.68rem; color: #808090; background: var(--surface); border: 1px solid var(--border); padding: 6px 14px; border-radius: 2px; }
+  .welcome-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent); color: #000;
+    font-family: var(--mono); font-weight: 700; font-size: 0.9rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    border: none; border-radius: 4px; padding: 18px 40px;
+    cursor: pointer; transition: all 0.2s; width: 100%;
+    justify-content: center;
+  }
+  .welcome-btn:hover { background: #00e67a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,255,136,0.25); }
+  .welcome-btn:active { transform: translateY(0); }
+  .welcome-btn .btn-icon { font-size: 1.2rem; }
+  .welcome-note { margin-top: 16px; font-family: var(--mono); font-size: 0.65rem; color: #404060; }
+
+  /* ===== APP ===== */
+  .app { position: fixed; inset: 0; display: flex; flex-direction: column; z-index: 1; display: none; }
+  .app.show { display: flex; }
 
   /* Header */
-  .header { flex-shrink: 0; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--bg); }
-  .logo { font-family: var(--sans); font-weight: 800; font-size: 1.2rem; letter-spacing: -0.02em; }
+  .header { flex-shrink: 0; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--bg); gap: 10px; }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .burger { width: 36px; height: 36px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; border: 1px solid var(--border); border-radius: 3px; background: transparent; flex-shrink: 0; transition: all 0.2s; }
+  .burger:hover { border-color: var(--accent); background: rgba(0,255,136,0.05); }
+  .burger span { display: block; width: 16px; height: 2px; background: var(--text); border-radius: 1px; transition: all 0.2s; }
+  .logo { font-family: var(--sans); font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
   .logo span { color: var(--accent); }
-  .badge { font-family: var(--mono); font-size: 0.65rem; background: rgba(0,255,136,0.1); color: var(--accent); border: 1px solid rgba(0,255,136,0.3); padding: 3px 8px; border-radius: 2px; letter-spacing: 0.1em; }
+  .badge { font-family: var(--mono); font-size: 0.6rem; background: rgba(0,255,136,0.1); color: var(--accent); border: 1px solid rgba(0,255,136,0.3); padding: 3px 8px; border-radius: 2px; letter-spacing: 0.1em; }
 
   /* Email strip */
-  .email-strip { flex-shrink: 0; padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--border); position: relative; }
+  .email-strip { flex-shrink: 0; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border); position: relative; }
   .email-strip::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
   .email-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .email-label { font-family: var(--mono); font-size: 0.62rem; color: #606080; text-transform: uppercase; letter-spacing: 0.15em; flex-shrink: 0; }
-  .email-address { font-family: var(--mono); font-size: clamp(0.78rem, 2.5vw, 1rem); font-weight: 700; color: var(--accent); flex: 1; min-width: 160px; padding: 8px 12px; background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.2); border-radius: 3px; cursor: pointer; transition: all 0.2s; position: relative; word-break: break-all; user-select: all; }
-  .email-address:hover { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.4); }
-  .email-address.copied::after { content: '✓ СКОПИРОВАНО'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; background: var(--accent); color: #000; border-radius: 3px; font-weight: 700; letter-spacing: 0.1em; }
-  .btn { font-family: var(--mono); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: none; border-radius: 3px; cursor: pointer; padding: 8px 14px; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
+  .email-label { font-family: var(--mono); font-size: 0.6rem; color: #606080; text-transform: uppercase; letter-spacing: 0.15em; flex-shrink: 0; }
+  .email-address {
+    font-family: var(--mono); font-size: clamp(0.75rem,2vw,0.95rem); font-weight: 700; color: var(--accent);
+    flex: 1; min-width: 140px; padding: 7px 11px;
+    background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.2); border-radius: 3px;
+    cursor: pointer; transition: all 0.2s; position: relative; word-break: break-all; user-select: all;
+  }
+  .email-address:hover { background: rgba(0,255,136,0.1); }
+  .email-address.copied::after { content: '✓ СКОПИРОВАНО'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; background: var(--accent); color: #000; border-radius: 3px; font-weight: 700; letter-spacing: 0.1em; }
+  .btn { font-family: var(--mono); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border: none; border-radius: 3px; cursor: pointer; padding: 7px 12px; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
   .btn-primary { background: var(--accent); color: #000; }
   .btn-primary:hover { background: #00e67a; }
   .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
   .btn-ghost:hover { border-color: #4a4a6a; background: var(--surface2); }
   .btn-danger { background: transparent; color: #ff6b6b; border: 1px solid rgba(255,107,107,0.3); }
   .btn-danger:hover { background: rgba(255,107,107,0.1); }
-  .status-bar { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-family: var(--mono); font-size: 0.65rem; color: #606080; }
+  .status-bar { display: flex; align-items: center; gap: 6px; margin-top: 7px; font-family: var(--mono); font-size: 0.62rem; color: #606080; }
   .status-dot { width: 5px; height: 5px; border-radius: 50%; background: #404060; flex-shrink: 0; }
   .status-dot.active { background: var(--accent); box-shadow: 0 0 5px var(--accent); animation: pulse 2s infinite; }
 
   /* Content */
   .content { flex: 1; display: flex; overflow: hidden; min-height: 0; }
 
-  /* Inbox panel */
-  .inbox-panel { width: 100%; display: flex; flex-direction: column; border-right: 1px solid var(--border); transition: width 0.3s ease; overflow: hidden; min-width: 0; }
-  .inbox-panel.split { width: 38%; min-width: 190px; }
-  .inbox-hdr { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg); }
-  .inbox-title { font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  .count-badge { font-family: var(--mono); font-size: 0.65rem; background: var(--accent2); color: #fff; padding: 1px 7px; border-radius: 20px; display: none; }
-  .count-badge.show { display: inline-block; }
-  .last-check { font-family: var(--mono); font-size: 0.6rem; color: #404060; }
-  .inbox-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
-  .inbox-scroll::-webkit-scrollbar { width: 4px; }
-  .inbox-scroll::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
-  .inbox-empty { text-align: center; padding: 40px 16px; color: #606080; font-family: var(--mono); font-size: 0.72rem; line-height: 2; }
-  .inbox-empty .icon { font-size: 2.2rem; display: block; margin-bottom: 10px; opacity: 0.3; }
-  .loading-row { padding: 20px; text-align: center; font-family: var(--mono); font-size: 0.72rem; color: #606080; display: none; }
-  .loading-row.show { display: block; }
+  /* Sidebar drawer */
+  .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 50; display: none; backdrop-filter: blur(2px); }
+  .sidebar-overlay.open { display: block; }
+  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 300px; max-width: 85vw; background: var(--surface); border-right: 1px solid var(--border); z-index: 51; transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .sidebar-title { font-weight: 800; font-size: 0.9rem; }
+  .sidebar-close { background: none; border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 0.65rem; padding: 5px 10px; border-radius: 2px; cursor: pointer; }
+  .sidebar-close:hover { border-color: #ff6b6b; color: #ff6b6b; }
+  .sidebar-body { flex: 1; overflow-y: auto; padding: 12px; }
+  .sidebar-body::-webkit-scrollbar { width: 4px; }
+  .sidebar-body::-webkit-scrollbar-thumb { background: #2a2a3a; }
+  .sidebar-empty { text-align: center; padding: 40px 16px; font-family: var(--mono); font-size: 0.72rem; color: #606080; line-height: 2; }
+  .sidebar-empty .icon { font-size: 2rem; display: block; margin-bottom: 8px; opacity: 0.3; }
+  .sidebar-hint { font-family: var(--mono); font-size: 0.62rem; color: #404060; padding: 10px 12px; border-radius: 3px; background: var(--surface2); border: 1px solid var(--border); margin-bottom: 12px; line-height: 1.7; }
+  .saved-item { padding: 10px 12px; border-radius: 3px; border: 1px solid var(--border); margin-bottom: 8px; cursor: pointer; transition: all 0.15s; position: relative; }
+  .saved-item:hover { border-color: rgba(0,255,136,0.4); background: var(--surface2); }
+  .saved-item.active-box { border-color: var(--accent); background: rgba(0,255,136,0.05); }
+  .saved-addr { font-family: var(--mono); font-size: 0.7rem; color: var(--accent); word-break: break-all; margin-bottom: 4px; }
+  .saved-date { font-family: var(--mono); font-size: 0.6rem; color: #404060; }
+  .saved-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .saved-btn { font-family: var(--mono); font-size: 0.6rem; padding: 4px 8px; border-radius: 2px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text); transition: all 0.15s; }
+  .saved-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .saved-btn.del { color: #ff6b6b; }
+  .saved-btn.del:hover { border-color: #ff6b6b; background: rgba(255,107,107,0.1); }
+  .sidebar-footer { padding: 12px; border-top: 1px solid var(--border); }
+  .sidebar-new-btn { width: 100%; font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--accent); color: #000; border: none; border-radius: 3px; padding: 10px; cursor: pointer; transition: all 0.2s; }
+  .sidebar-new-btn:hover { background: #00e67a; }
 
-  /* Message list items */
-  .message-item { padding: 11px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; border-left: 3px solid transparent; }
+  /* Save btn in header */
+  .btn-save { background: transparent; color: var(--accent); border: 1px solid rgba(0,255,136,0.3); font-family: var(--mono); font-size: 0.6rem; padding: 5px 10px; border-radius: 2px; cursor: pointer; flex-shrink: 0; transition: all 0.2s; white-space: nowrap; }
+  .btn-save:hover { background: rgba(0,255,136,0.1); }
+
+  /* Inbox list */
+  .inbox-panel { width: 100%; display: flex; flex-direction: column; border-right: 1px solid var(--border); transition: width 0.25s ease; overflow: hidden; min-width: 0; }
+  .inbox-panel.split { width: 38%; min-width: 180px; }
+  .inbox-hdr { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .inbox-title { font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .count-badge { font-family: var(--mono); font-size: 0.62rem; background: var(--accent2); color: #fff; padding: 1px 7px; border-radius: 20px; display: none; }
+  .count-badge.show { display: inline-block; }
+  .last-check { font-family: var(--mono); font-size: 0.58rem; color: #404060; }
+  .inbox-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
+  .inbox-scroll::-webkit-scrollbar { width: 3px; }
+  .inbox-scroll::-webkit-scrollbar-thumb { background: #2a2a3a; }
+  .inbox-empty { text-align: center; padding: 40px 14px; color: #606080; font-family: var(--mono); font-size: 0.7rem; line-height: 2; }
+  .inbox-empty .icon { font-size: 2rem; display: block; margin-bottom: 8px; opacity: 0.3; }
+  .loading-row { padding: 16px; text-align: center; font-family: var(--mono); font-size: 0.7rem; color: #606080; display: none; }
+  .loading-row.show { display: block; }
+  .message-item { padding: 10px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.12s; border-left: 3px solid transparent; }
   .message-item:hover { background: var(--surface2); }
   .message-item.active { background: var(--surface2); border-left-color: var(--accent); }
   .message-item.unread { border-left-color: var(--accent2); }
   .message-item.unread.active { border-left-color: var(--accent); }
-  .msg-from { font-family: var(--mono); font-size: 0.68rem; color: var(--accent); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .msg-subject { font-size: 0.8rem; font-weight: 700; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .msg-preview { font-family: var(--mono); font-size: 0.62rem; color: #505070; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .msg-time { font-family: var(--mono); font-size: 0.6rem; color: #404060; margin-top: 3px; }
+  .msg-from { font-family: var(--mono); font-size: 0.65rem; color: var(--accent); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .msg-subject { font-size: 0.78rem; font-weight: 700; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .msg-preview { font-family: var(--mono); font-size: 0.6rem; color: #505070; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .msg-time { font-family: var(--mono); font-size: 0.58rem; color: #404060; margin-top: 3px; }
 
   /* Message viewer */
-  .msg-panel { flex: 1; display: none; flex-direction: column; overflow: hidden; min-width: 0; background: var(--bg); }
+  .msg-panel { flex: 1; display: none; flex-direction: column; overflow: hidden; min-width: 0; }
   .msg-panel.open { display: flex; }
-  .msg-panel-hdr { flex-shrink: 0; padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .msg-subject-text { font-weight: 800; font-size: 0.95rem; line-height: 1.3; margin-bottom: 4px; word-break: break-word; }
-  .msg-meta { font-family: var(--mono); font-size: 0.65rem; color: #606080; line-height: 1.8; }
-  .btn-back { font-family: var(--mono); font-size: 0.65rem; background: transparent; color: var(--text); border: 1px solid var(--border); padding: 6px 12px; border-radius: 2px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.2s; display: none; }
+  .msg-panel-hdr { flex-shrink: 0; padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .msg-subject-text { font-weight: 800; font-size: 0.92rem; line-height: 1.3; margin-bottom: 3px; word-break: break-word; }
+  .msg-meta { font-family: var(--mono); font-size: 0.63rem; color: #606080; line-height: 1.8; }
+  .btn-back { font-family: var(--mono); font-size: 0.62rem; background: transparent; color: var(--text); border: 1px solid var(--border); padding: 5px 11px; border-radius: 2px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.2s; display: none; }
   .btn-back:hover { border-color: #4a4a6a; }
   @media (max-width: 600px) {
     .inbox-panel.split { width: 0; min-width: 0; border: none; overflow: hidden; }
     .btn-back { display: inline-block; }
   }
-  .msg-panel-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px; }
-  .msg-panel-body::-webkit-scrollbar { width: 4px; }
-  .msg-panel-body::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
-
-  /* Email content */
+  .msg-panel-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 18px; }
+  .msg-panel-body::-webkit-scrollbar { width: 3px; }
+  .msg-panel-body::-webkit-scrollbar-thumb { background: #2a2a3a; }
   .email-html-content { background: #fff; border-radius: 4px; padding: 16px; color: #111; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; word-break: break-word; overflow-x: auto; }
   .email-html-content a { color: #1a73e8 !important; text-decoration: underline !important; cursor: pointer !important; pointer-events: auto !important; }
   .email-html-content img { max-width: 100%; height: auto; }
-  .email-text-content { font-family: var(--mono); font-size: 0.78rem; line-height: 1.8; color: #c0c0d8; white-space: pre-wrap; word-break: break-word; }
+  .email-text-content { font-family: var(--mono); font-size: 0.76rem; line-height: 1.8; color: #c0c0d8; white-space: pre-wrap; word-break: break-word; }
   .email-text-content a { color: var(--accent); text-decoration: underline; cursor: pointer; }
 
   /* Toast */
-  .toast-container { position: fixed; bottom: 16px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 6px; }
-  .toast { font-family: var(--mono); font-size: 0.7rem; padding: 10px 16px; border-radius: 3px; border-left: 3px solid var(--accent); background: var(--surface2); color: var(--text); animation: slideIn 0.3s ease; max-width: 280px; }
+  .toast-container { position: fixed; bottom: 16px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+  .toast { font-family: var(--mono); font-size: 0.68rem; padding: 9px 14px; border-radius: 3px; border-left: 3px solid var(--accent); background: var(--surface2); color: var(--text); animation: slideIn 0.3s ease; max-width: 260px; }
   .toast.error { border-left-color: #ff6b6b; }
 
   .spinner { display: inline-block; width: 11px; height: 11px; border: 2px solid rgba(0,255,136,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 5px; }
 
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
   @keyframes spin { to{transform:rotate(360deg)} }
-  @keyframes slideIn { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes slideIn { from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)} }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="header">
-    <div class="logo">DROP<span>MAIL</span></div>
-    <span class="badge">TEMP EMAIL</span>
+
+<!-- ===== WELCOME ===== -->
+<div class="welcome" id="welcomeScreen">
+  <div class="welcome-inner">
+    <div class="big-logo">DROP<span>MAIL</span></div>
+    <div class="tagline">// временная почта · без регистрации</div>
+    <div class="welcome-features">
+      <span class="feat">Без регистрации</span>
+      <span class="feat">Бесплатно</span>
+      <span class="feat">Автообновление</span>
+    </div>
+    <button class="welcome-btn" onclick="startApp()">
+      <span class="btn-icon">⚡</span>
+      Создать почту
+    </button>
+    <div class="welcome-note">Нажми — и получишь временный адрес мгновенно</div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div class="app" id="appScreen">
+
+  <!-- Sidebar overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">📬 Мои почты</div>
+      <button class="sidebar-close" onclick="closeSidebar()">✕ Закрыть</button>
+    </div>
+    <div class="sidebar-body" id="sidebarBody">
+      <div class="sidebar-hint">Сохранённые адреса хранятся в браузере. Нажми на адрес — переключишься на него.</div>
+      <div class="sidebar-empty" id="sidebarEmpty">
+        <span class="icon">📭</span>
+        Сохранённых почт нет.<br>Нажми "Сохранить" чтобы<br>добавить текущую.
+      </div>
+      <div id="savedList"></div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="sidebar-new-btn" onclick="generateNewAndClose()">+ Создать новый адрес</button>
+    </div>
   </div>
 
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <button class="burger" onclick="openSidebar()" title="Мои почты">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="logo">DROP<span>MAIL</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="btn-save" onclick="saveCurrentEmail()" id="saveBtn">💾 Сохранить</button>
+      <span class="badge">TEMP EMAIL</span>
+    </div>
+  </div>
+
+  <!-- Email strip -->
   <div class="email-strip">
     <div class="email-row">
       <span class="email-label">адрес:</span>
@@ -133,6 +257,7 @@
     </div>
   </div>
 
+  <!-- Content -->
   <div class="content">
     <div class="inbox-panel" id="inboxPanel">
       <div class="inbox-hdr">
@@ -169,71 +294,177 @@
 
 <script>
 const API = 'https://api.mail.tm';
-let token = null, currentEmail = null, autoRefreshInterval = null, messages = [], activeId = null;
+const STORAGE_KEY = 'dropmail_saved';
+let token = null, currentEmail = null, currentPassword = null;
+let autoRefreshInterval = null, messages = [], activeId = null;
 
-(async () => {
-  try { await generateNew(); }
-  catch(e) { setStatus(false,'Ошибка подключения'); showToast('Не удалось подключиться',true); }
+// ===== WELCOME =====
+// Если есть сохранённые почты — пропускаем приветствие
+(function() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    if (saved.length > 0) {
+      document.getElementById('welcomeScreen').style.display = 'none';
+      document.getElementById('appScreen').classList.add('show');
+      const last = saved[0];
+      setTimeout(() => switchToSaved(last.address, last.password), 0);
+    }
+  } catch(e) {}
 })();
 
+function startApp() {
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.getElementById('appScreen').classList.add('show');
+  generateNew();
+}
+
+// ===== SIDEBAR =====
+function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('open'); renderSidebar(); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
+function generateNewAndClose() { closeSidebar(); generateNew(); }
+
+function getSaved() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
+}
+function setSaved(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+function saveCurrentEmail() {
+  if (!currentEmail || !token) return;
+  const saved = getSaved();
+  if (saved.find(s => s.address === currentEmail)) { showToast('Этот адрес уже сохранён'); return; }
+  saved.unshift({ address: currentEmail, password: currentPassword, savedAt: new Date().toISOString() });
+  // Keep max 10
+  if (saved.length > 10) saved.pop();
+  setSaved(saved);
+  showToast('✓ Почта сохранена!');
+  renderSidebar();
+}
+
+function deleteSaved(addr) {
+  const saved = getSaved().filter(s => s.address !== addr);
+  setSaved(saved);
+  renderSidebar();
+  showToast('Адрес удалён');
+}
+
+function copySaved(addr) {
+  copyText(addr, 'Адрес скопирован!');
+}
+
+async function switchToSaved(addr, password) {
+  closeSidebar();
+  clearInterval(autoRefreshInterval);
+  messages = []; activeId = null;
+  document.getElementById('messageList').innerHTML = '';
+  document.getElementById('inboxEmpty').style.display = 'block';
+  closeMessage();
+  document.getElementById('emailAddress').innerHTML = '<span class="spinner"></span> подключение...';
+  setStatus(false, 'Подключение к сохранённому адресу...');
+
+  try {
+    const tr = await fetch(`${API}/token`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({address: addr, password})
+    });
+    if (!tr.ok) throw new Error('Не удалось войти. Адрес мог устареть.');
+    const td = await tr.json();
+    token = td.token;
+    currentEmail = addr;
+    currentPassword = password;
+    document.getElementById('emailAddress').textContent = currentEmail;
+    setStatus(true, 'Готово · обновление каждые 5 сек');
+    showToast('Переключился на ' + addr);
+    await refreshMessages();
+    autoRefreshInterval = setInterval(refreshMessages, 5000);
+  } catch(e) {
+    showToast(e.message, true);
+    document.getElementById('emailAddress').textContent = 'Ошибка';
+    setStatus(false, e.message);
+  }
+}
+
+function renderSidebar() {
+  const saved = getSaved();
+  const empty = document.getElementById('sidebarEmpty');
+  const list = document.getElementById('savedList');
+  if (!saved.length) { empty.style.display = 'block'; list.innerHTML = ''; return; }
+  empty.style.display = 'none';
+  list.innerHTML = saved.map(s => {
+    const isActive = s.address === currentEmail;
+    const date = new Date(s.savedAt).toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    return `<div class="saved-item ${isActive?'active-box':''}">
+      <div class="saved-addr">${esc(s.address)}</div>
+      <div class="saved-date">Сохранено: ${date}</div>
+      <div class="saved-actions">
+        ${!isActive ? `<button class="saved-btn" onclick="switchToSaved('${esc(s.address)}','${esc(s.password)}')">→ Использовать</button>` : '<span style="font-family:var(--mono);font-size:0.6rem;color:var(--accent)">✓ Активна</span>'}
+        <button class="saved-btn" onclick="copySaved('${esc(s.address)}')">📋 Копировать</button>
+        <button class="saved-btn del" onclick="deleteSaved('${esc(s.address)}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== MAIL =====
 async function generateNew() {
   clearInterval(autoRefreshInterval);
-  token = null; currentEmail = null; messages = []; activeId = null;
+  token = null; currentEmail = null; currentPassword = null; messages = []; activeId = null;
   document.getElementById('messageList').innerHTML = '';
   document.getElementById('inboxEmpty').style.display = 'block';
   document.getElementById('emailAddress').innerHTML = '<span class="spinner"></span> генерация...';
-  setStatus(false,'Генерация адреса...');
+  setStatus(false, 'Генерация адреса...');
   closeMessage();
 
   try {
     const dr = await fetch(`${API}/domains?page=1`);
-    if(!dr.ok) throw new Error('domains');
+    if (!dr.ok) throw new Error('domains');
     const dd = await dr.json();
     const domains = dd['hydra:member'] || dd.member || [];
-    if(!domains.length) throw new Error('no domains');
+    if (!domains.length) throw new Error('no domains');
     const domain = domains[0].domain;
 
     const rand = () => Math.random().toString(36).substring(2,10);
     const address = `${rand()}@${domain}`;
     const password = rand()+rand();
 
-    const cr = await fetch(`${API}/accounts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({address,password})});
-    if(!cr.ok) throw new Error('create');
+    const cr = await fetch(`${API}/accounts`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({address,password})});
+    if (!cr.ok) throw new Error('create');
 
-    const tr = await fetch(`${API}/token`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({address,password})});
-    if(!tr.ok) throw new Error('token');
+    const tr = await fetch(`${API}/token`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({address,password})});
+    if (!tr.ok) throw new Error('token');
     const td = await tr.json();
     token = td.token;
     currentEmail = address;
+    currentPassword = password;
 
     document.getElementById('emailAddress').textContent = currentEmail;
-    setStatus(true,'Готово · обновление каждые 5 сек');
+    setStatus(true, 'Готово · обновление каждые 5 сек');
     showToast('Новый адрес создан!');
-
     await refreshMessages();
-    autoRefreshInterval = setInterval(refreshMessages,5000);
+    autoRefreshInterval = setInterval(refreshMessages, 5000);
   } catch(e) {
     document.getElementById('emailAddress').textContent = 'Ошибка генерации';
-    setStatus(false,'Ошибка: '+e.message);
-    showToast('Ошибка создания адреса',true);
+    setStatus(false, 'Ошибка: '+e.message);
+    showToast('Ошибка создания адреса', true);
   }
 }
 
 async function refreshMessages() {
-  if(!token) return;
+  if (!token) return;
   document.getElementById('loadingState').classList.add('show');
   try {
-    const res = await fetch(`${API}/messages`,{headers:{'Authorization':`Bearer ${token}`}});
-    if(!res.ok) throw new Error('fetch');
+    const res = await fetch(`${API}/messages`, {headers:{'Authorization':`Bearer ${token}`}});
+    if (!res.ok) throw new Error('fetch');
     const data = await res.json();
     const msgs = data['hydra:member'] || data.member || [];
-    const newCount = msgs.filter(m=>!messages.find(o=>o.id===m.id)).length;
-    if(newCount>0 && messages.length>0) showToast(`📬 ${newCount} новое письмо!`);
+    const newCount = msgs.filter(m => !messages.find(o => o.id===m.id)).length;
+    if (newCount > 0 && messages.length > 0) showToast(`📬 ${newCount} новое письмо!`);
     messages = msgs;
     renderMessages();
     const now = new Date();
     document.getElementById('lastCheck').textContent = now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  } catch(e){console.error(e);}
+  } catch(e) { console.error(e); }
   document.getElementById('loadingState').classList.remove('show');
 }
 
@@ -241,11 +472,11 @@ function renderMessages() {
   const list = document.getElementById('messageList');
   const empty = document.getElementById('inboxEmpty');
   const badge = document.getElementById('countBadge');
-  if(!messages.length){list.innerHTML='';empty.style.display='block';badge.classList.remove('show');return;}
-  empty.style.display='none';
-  badge.textContent=messages.length;
+  if (!messages.length) { list.innerHTML=''; empty.style.display='block'; badge.classList.remove('show'); return; }
+  empty.style.display = 'none';
+  badge.textContent = messages.length;
   badge.classList.add('show');
-  list.innerHTML = messages.map(msg=>{
+  list.innerHTML = messages.map(msg => {
     const from = msg.from?.address||msg.from||'неизвестно';
     const subj = msg.subject||'(без темы)';
     const intro = msg.intro||'';
@@ -263,8 +494,8 @@ function renderMessages() {
 
 async function openMessage(id) {
   activeId = id;
-  const msg = messages.find(m=>m.id===id);
-  if(!msg) return;
+  const msg = messages.find(m => m.id===id);
+  if (!msg) return;
   document.getElementById('msgSubject').textContent = msg.subject||'(без темы)';
   document.getElementById('msgMeta').innerHTML = `От: ${esc(msg.from?.address||msg.from||'')}<br>Дата: ${formatTime(msg.createdAt,true)}`;
   document.getElementById('msgBody').innerHTML = '<div style="padding:20px;font-family:var(--mono);font-size:0.75rem;color:#606080"><span class="spinner"></span> загрузка...</div>';
@@ -273,44 +504,31 @@ async function openMessage(id) {
   renderMessages();
 
   try {
-    const res = await fetch(`${API}/messages/${id}`,{headers:{'Authorization':`Bearer ${token}`}});
+    const res = await fetch(`${API}/messages/${id}`, {headers:{'Authorization':`Bearer ${token}`}});
     const data = await res.json();
     const body = document.getElementById('msgBody');
-
-    if(data.html && data.html.length) {
+    if (data.html && data.html.length) {
       const htmlContent = Array.isArray(data.html) ? data.html.join('') : data.html;
       const div = document.createElement('div');
       div.className = 'email-html-content';
       div.innerHTML = htmlContent;
-      // Fix all links to be clickable and open externally
       div.querySelectorAll('a').forEach(a => {
         const href = a.getAttribute('href');
-        if(href && !href.startsWith('mailto:')) {
-          a.setAttribute('target','_blank');
-          a.setAttribute('rel','noopener noreferrer');
-        }
-        a.style.pointerEvents = 'auto';
-        a.style.cursor = 'pointer';
+        if (href && !href.startsWith('mailto:')) { a.setAttribute('target','_blank'); a.setAttribute('rel','noopener noreferrer'); }
+        a.style.pointerEvents = 'auto'; a.style.cursor = 'pointer';
       });
-      // Fix images
-      div.querySelectorAll('img').forEach(img => {
-        img.style.maxWidth = '100%';
-        img.style.height = 'auto';
-      });
-      body.innerHTML = '';
-      body.appendChild(div);
-    } else if(data.text) {
+      div.querySelectorAll('img').forEach(img => { img.style.maxWidth='100%'; img.style.height='auto'; });
+      body.innerHTML = ''; body.appendChild(div);
+    } else if (data.text) {
       const linked = data.text.replace(/(https?:\/\/[^\s<>"']+)/g,'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
       const div = document.createElement('div');
       div.className = 'email-text-content';
       div.innerHTML = linked;
-      body.innerHTML = '';
-      body.appendChild(div);
+      body.innerHTML = ''; body.appendChild(div);
     } else {
       body.innerHTML = '<div style="font-family:var(--mono);font-size:0.8rem;color:#606080;padding:20px">(письмо пустое)</div>';
     }
-    msg.seen = true;
-    renderMessages();
+    msg.seen = true; renderMessages();
   } catch(e) {
     document.getElementById('msgBody').innerHTML = '<div style="color:#ff6b6b;font-family:var(--mono);font-size:0.8rem;padding:20px">Ошибка загрузки</div>';
   }
@@ -323,49 +541,57 @@ function closeMessage() {
   document.getElementById('msgBody').innerHTML = '';
 }
 
+// ===== UTILS =====
 function copyEmail() {
-  if(!currentEmail) return;
-  const el = document.getElementById('emailAddress');
-  const ok = () => { el.classList.add('copied'); setTimeout(()=>el.classList.remove('copied'),1500); showToast('Адрес скопирован!'); };
-  if(navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(currentEmail).then(ok).catch(fb);
-  } else { fb(); }
-  function fb() {
-    const ta = document.createElement('textarea');
-    ta.value = currentEmail;
-    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
-    document.body.appendChild(ta); ta.focus(); ta.select();
-    try { document.execCommand('copy'); ok(); } catch(e){ showToast('Скопируй вручную: '+currentEmail,true); }
-    document.body.removeChild(ta);
-  }
+  if (!currentEmail) return;
+  copyText(currentEmail, 'Адрес скопирован!', document.getElementById('emailAddress'));
 }
 
-function setStatus(active,text) {
-  document.getElementById('statusDot').className='status-dot'+(active?' active':'');
-  document.getElementById('statusText').textContent=text;
+function copyText(text, successMsg, el) {
+  const ok = () => {
+    if (el) { el.classList.add('copied'); setTimeout(()=>el.classList.remove('copied'),1500); }
+    showToast(successMsg);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(ok).catch(()=>fallback(text,ok));
+  } else { fallback(text,ok); }
 }
 
-function showToast(msg,isError=false) {
-  const c=document.getElementById('toasts');
-  const t=document.createElement('div');
-  t.className='toast'+(isError?' error':'');
-  t.textContent=msg;
+function fallback(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e){ showToast('Ошибка копирования',true); }
+  document.body.removeChild(ta);
+}
+
+function setStatus(active, text) {
+  document.getElementById('statusDot').className = 'status-dot'+(active?' active':'');
+  document.getElementById('statusText').textContent = text;
+}
+
+function showToast(msg, isError=false) {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast'+(isError?' error':'');
+  t.textContent = msg;
   c.appendChild(t);
   setTimeout(()=>t.remove(),4000);
 }
 
-function formatTime(str,full=false) {
-  if(!str) return '';
-  const d=new Date(str);
-  if(full) return d.toLocaleString('ru-RU');
-  const diff=Date.now()-d;
-  if(diff<60000) return 'только что';
-  if(diff<3600000) return Math.floor(diff/60000)+' мин назад';
-  if(diff<86400000) return d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+function formatTime(str, full=false) {
+  if (!str) return '';
+  const d = new Date(str);
+  if (full) return d.toLocaleString('ru-RU');
+  const diff = Date.now()-d;
+  if (diff<60000) return 'только что';
+  if (diff<3600000) return Math.floor(diff/60000)+' мин назад';
+  if (diff<86400000) return d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
   return d.toLocaleDateString('ru-RU');
 }
 
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 </script>
 </body>
 </html>
